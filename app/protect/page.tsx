@@ -4,7 +4,7 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { FileDrop } from "@/components/FileDrop";
-import { SplitPanel } from "@/components/SplitPanel";
+import { ProtectPanel } from "@/components/ProtectPanel";
 import { ToolPageLayout } from "@/components/ToolPageLayout";
 
 const PdfPreview = dynamic(
@@ -20,10 +20,9 @@ const PdfPreview = dynamic(
   }
 );
 
-export default function SplitPage() {
+export default function ProtectPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,8 +33,8 @@ export default function SplitPage() {
     setError(null);
   };
 
-  const handleSplit = async () => {
-    if (!pdfFile || !pages.trim()) return;
+  const handleProtect = async (userPassword: string, ownerPassword?: string) => {
+    if (!pdfFile) return;
 
     setLoading(true);
     setError(null);
@@ -43,9 +42,10 @@ export default function SplitPage() {
     try {
       const formData = new FormData();
       formData.append("file", pdfFile);
-      formData.append("pages", pages);
+      formData.append("userPassword", userPassword);
+      if (ownerPassword) formData.append("ownerPassword", ownerPassword);
 
-      const res = await fetch("/api/split", { method: "POST", body: formData });
+      const res = await fetch("/api/protect", { method: "POST", body: formData });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -56,7 +56,7 @@ export default function SplitPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = res.headers.get("content-type")?.includes("zip") ? "split.zip" : "split-1.pdf";
+      a.download = "protected.pdf";
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -67,7 +67,7 @@ export default function SplitPage() {
   };
 
   return (
-    <ToolPageLayout title="Dividi PDF">
+    <ToolPageLayout title="Proteggi PDF">
       <div
         className={`grid min-h-[calc(100vh-10rem)] grid-cols-1 gap-0 ${pdfFile ? "lg:grid-cols-3" : ""}`}
       >
@@ -95,12 +95,10 @@ export default function SplitPage() {
         </div>
         {pdfFile && (
           <div className="rounded-b-xl border border-border bg-sidebar p-6 lg:rounded-l-none lg:rounded-r-xl lg:border-l">
-            <SplitPanel
+            <ProtectPanel
               pdfFile={pdfFile}
               onPdfChange={setPdfFile}
-              pages={pages}
-              onPagesChange={setPages}
-              onSplit={handleSplit}
+              onProtect={handleProtect}
               loading={loading}
               error={error}
             />

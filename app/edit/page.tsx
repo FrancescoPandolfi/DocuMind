@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
 import { EditPanel } from "@/components/EditPanel";
 import { EditToolbar } from "@/components/EditToolbar";
 import { FileDrop } from "@/components/FileDrop";
@@ -29,8 +30,9 @@ async function getImageAspectRatio(file: File): Promise<number> {
 const PdfPreview = dynamic(() => import("@/components/PdfPreview").then((m) => ({ default: m.PdfPreview })), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[400px] items-center justify-center rounded-xl border border-border bg-card">
-      <p className="text-slate-500">Caricamento anteprima...</p>
+    <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-xl border border-border bg-card">
+      <Loader2 className="size-10 animate-spin text-primary" />
+      <p className="text-sm text-muted-foreground">Caricamento anteprima...</p>
     </div>
   ),
 });
@@ -126,7 +128,7 @@ export default function EditPage() {
 
   return (
     <ToolPageLayout title="Modifica PDF">
-        <div className="grid min-h-[calc(100vh-10rem)] grid-cols-1 gap-0 lg:grid-cols-3">
+        <div className={`grid min-h-[calc(100vh-10rem)] grid-cols-1 gap-0 ${pdfFile ? "lg:grid-cols-3" : ""}`}>
           <div className="flex min-h-[calc(100vh-12rem)] min-w-0 flex-col overflow-hidden rounded-t-xl border border-r-0 border-border bg-muted/30 lg:rounded-r-none lg:rounded-l-xl lg:col-span-2">
             {!pdfFile ? (
               <FileDrop
@@ -237,22 +239,24 @@ export default function EditPage() {
               </div>
             </div>
             <div className="min-h-0 flex-1 overflow-auto p-4">
-              <PdfPreview
-                file={pdfFile}
-                currentPage={currentPage}
-                overlays={overlays}
-                images={images}
-                onPageChange={setCurrentPage}
-                onPageCount={setNumPages}
-                onOverlayMove={handleOverlayMove}
-                onOverlayResize={handleOverlayResize}
-                onOverlaySelect={setSelectedOverlayId}
-                selectedOverlayId={selectedOverlayId}
-              />
+            <PdfPreview
+              file={pdfFile}
+              currentPage={currentPage}
+              overlays={overlays}
+              images={images}
+              onPageChange={setCurrentPage}
+              onPageCount={setNumPages}
+              onOverlayMove={handleOverlayMove}
+              onOverlayResize={handleOverlayResize}
+              onOverlaySelect={setSelectedOverlayId}
+              onOverlayUpdate={handleOverlayUpdate}
+              selectedOverlayId={selectedOverlayId}
+            />
             </div>
             </>
             )}
           </div>
+          {pdfFile && (
           <div className="rounded-b-xl border border-border bg-sidebar p-6 lg:rounded-l-none lg:rounded-r-xl lg:border-l">
             <EditPanel
               pdfFile={pdfFile}
@@ -271,6 +275,7 @@ export default function EditPage() {
               onPageChange={setCurrentPage}
             />
           </div>
+          )}
         </div>
     </ToolPageLayout>
   );

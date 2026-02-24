@@ -4,8 +4,9 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { FileDrop } from "@/components/FileDrop";
-import { SplitPanel } from "@/components/SplitPanel";
+import { PageNumbersPanel } from "@/components/PageNumbersPanel";
 import { ToolPageLayout } from "@/components/ToolPageLayout";
+import type { PageNumberFormat, PageNumberPosition } from "@/lib/pdf-service";
 
 const PdfPreview = dynamic(
   () => import("@/components/PdfPreview").then((m) => ({ default: m.PdfPreview })),
@@ -20,10 +21,11 @@ const PdfPreview = dynamic(
   }
 );
 
-export default function SplitPage() {
+export default function PageNumbersPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState("");
+  const [format, setFormat] = useState<PageNumberFormat>("1 / N");
+  const [position, setPosition] = useState<PageNumberPosition>("bottom-center");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,8 +36,8 @@ export default function SplitPage() {
     setError(null);
   };
 
-  const handleSplit = async () => {
-    if (!pdfFile || !pages.trim()) return;
+  const handleApply = async () => {
+    if (!pdfFile) return;
 
     setLoading(true);
     setError(null);
@@ -43,9 +45,10 @@ export default function SplitPage() {
     try {
       const formData = new FormData();
       formData.append("file", pdfFile);
-      formData.append("pages", pages);
+      formData.append("format", format);
+      formData.append("position", position);
 
-      const res = await fetch("/api/split", { method: "POST", body: formData });
+      const res = await fetch("/api/page-numbers", { method: "POST", body: formData });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -56,7 +59,7 @@ export default function SplitPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = res.headers.get("content-type")?.includes("zip") ? "split.zip" : "split-1.pdf";
+      a.download = "numbered.pdf";
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -67,7 +70,7 @@ export default function SplitPage() {
   };
 
   return (
-    <ToolPageLayout title="Dividi PDF">
+    <ToolPageLayout title="Numera pagine">
       <div
         className={`grid min-h-[calc(100vh-10rem)] grid-cols-1 gap-0 ${pdfFile ? "lg:grid-cols-3" : ""}`}
       >
@@ -95,12 +98,14 @@ export default function SplitPage() {
         </div>
         {pdfFile && (
           <div className="rounded-b-xl border border-border bg-sidebar p-6 lg:rounded-l-none lg:rounded-r-xl lg:border-l">
-            <SplitPanel
+            <PageNumbersPanel
               pdfFile={pdfFile}
               onPdfChange={setPdfFile}
-              pages={pages}
-              onPagesChange={setPages}
-              onSplit={handleSplit}
+              format={format}
+              onFormatChange={setFormat}
+              position={position}
+              onPositionChange={setPosition}
+              onApply={handleApply}
               loading={loading}
               error={error}
             />

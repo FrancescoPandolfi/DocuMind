@@ -1,7 +1,13 @@
 "use client";
 
 import { useRef } from "react";
+import { Shapes } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export type EditTool = "text" | "image" | "shape" | null;
 
@@ -54,25 +60,6 @@ function ImageIcon({ active }: { active: boolean }) {
   );
 }
 
-function ShapeIcon({ active }: { active: boolean }) {
-  return (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={active ? "text-foreground" : "text-muted-foreground"}
-    >
-      <rect x="3" y="3" width="10" height="10" rx="1" />
-      <circle cx="17" cy="7" r="4" />
-    </svg>
-  );
-}
-
 export function EditToolbar({ activeTool, onToolChange, hasPdf, onImagesSelected, onAddText, onAddShape }: EditToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -109,42 +96,54 @@ export function EditToolbar({ activeTool, onToolChange, hasPdf, onImagesSelected
         className="hidden"
         onChange={handleImageFilesChange}
       />
-      <Button
-        type="button"
-        variant={activeTool === "text" ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => (onAddText ? onAddText() : onToolChange(activeTool === "text" ? null : "text"))}
-        disabled={!hasPdf}
-        title="Aggiungi testo"
-        className="gap-2"
-      >
-        <TextIcon active={activeTool === "text"} />
-        <span>Aggiungi testo</span>
-      </Button>
-      <Button
-        type="button"
-        variant={activeTool === "image" ? "secondary" : "ghost"}
-        size="sm"
-        onClick={handleAddImageClick}
-        disabled={!hasPdf}
-        title="Aggiungi immagine"
-        className="gap-2"
-      >
-        <ImageIcon active={activeTool === "image"} />
-        <span>Aggiungi immagine</span>
-      </Button>
-      <Button
-        type="button"
-        variant={activeTool === "shape" ? "secondary" : "ghost"}
-        size="sm"
-        onClick={() => (onAddShape ? onAddShape() : onToolChange(activeTool === "shape" ? null : "shape"))}
-        disabled={!hasPdf}
-        title="Aggiungi forma"
-        className="gap-2"
-      >
-        <ShapeIcon active={activeTool === "shape"} />
-        <span>Aggiungi forma</span>
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex">
+            <Button
+              type="button"
+              variant={activeTool === "text" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => (onAddText ? onAddText() : onToolChange(activeTool === "text" ? null : "text"))}
+              disabled={!hasPdf}
+            >
+              <TextIcon active={activeTool === "text"} />
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Aggiungi testo</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex">
+            <Button
+              type="button"
+              variant={activeTool === "image" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={handleAddImageClick}
+              disabled={!hasPdf}
+            >
+              <ImageIcon active={activeTool === "image"} />
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Aggiungi immagine</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="inline-flex">
+            <Button
+              type="button"
+              variant={activeTool === "shape" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => (onAddShape ? onAddShape() : onToolChange(activeTool === "shape" ? null : "shape"))}
+              disabled={!hasPdf}
+            >
+              <Shapes className={activeTool === "shape" ? "text-foreground" : "text-muted-foreground"} />
+            </Button>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Aggiungi forma</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

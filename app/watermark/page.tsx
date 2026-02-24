@@ -4,8 +4,9 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { FileDrop } from "@/components/FileDrop";
-import { SplitPanel } from "@/components/SplitPanel";
+import { WatermarkPanel } from "@/components/WatermarkPanel";
 import { ToolPageLayout } from "@/components/ToolPageLayout";
+import type { WatermarkPosition } from "@/lib/pdf-service";
 
 const PdfPreview = dynamic(
   () => import("@/components/PdfPreview").then((m) => ({ default: m.PdfPreview })),
@@ -20,10 +21,13 @@ const PdfPreview = dynamic(
   }
 );
 
-export default function SplitPage() {
+export default function WatermarkPage() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState("");
+  const [text, setText] = useState("");
+  const [position, setPosition] = useState<WatermarkPosition>("center");
+  const [opacity, setOpacity] = useState(0.3);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,8 +38,9 @@ export default function SplitPage() {
     setError(null);
   };
 
-  const handleSplit = async () => {
-    if (!pdfFile || !pages.trim()) return;
+  const handleApply = async () => {
+    if (!pdfFile) return;
+    if (!text.trim() && !imageFile) return;
 
     setLoading(true);
     setError(null);
@@ -43,9 +48,12 @@ export default function SplitPage() {
     try {
       const formData = new FormData();
       formData.append("file", pdfFile);
-      formData.append("pages", pages);
+      formData.append("text", text);
+      formData.append("position", position);
+      formData.append("opacity", String(opacity));
+      if (imageFile) formData.append("image", imageFile);
 
-      const res = await fetch("/api/split", { method: "POST", body: formData });
+      const res = await fetch("/api/watermark", { method: "POST", body: formData });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -56,7 +64,7 @@ export default function SplitPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = res.headers.get("content-type")?.includes("zip") ? "split.zip" : "split-1.pdf";
+      a.download = "watermarked.pdf";
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -67,7 +75,7 @@ export default function SplitPage() {
   };
 
   return (
-    <ToolPageLayout title="Dividi PDF">
+    <ToolPageLayout title="Aggiungi watermark">
       <div
         className={`grid min-h-[calc(100vh-10rem)] grid-cols-1 gap-0 ${pdfFile ? "lg:grid-cols-3" : ""}`}
       >
@@ -95,12 +103,18 @@ export default function SplitPage() {
         </div>
         {pdfFile && (
           <div className="rounded-b-xl border border-border bg-sidebar p-6 lg:rounded-l-none lg:rounded-r-xl lg:border-l">
-            <SplitPanel
+            <WatermarkPanel
               pdfFile={pdfFile}
               onPdfChange={setPdfFile}
-              pages={pages}
-              onPagesChange={setPages}
-              onSplit={handleSplit}
+              text={text}
+              onTextChange={setText}
+              position={position}
+              onPositionChange={setPosition}
+              opacity={opacity}
+              onOpacityChange={setOpacity}
+              imageFile={imageFile}
+              onImageChange={setImageFile}
+              onApply={handleApply}
               loading={loading}
               error={error}
             />

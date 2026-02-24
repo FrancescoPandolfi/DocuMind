@@ -21,13 +21,6 @@ export function TextFormatToolbar({ text, onUpdate, onDelete }: TextFormatToolba
   const colorHex = rgbToHex(tc.r, tc.g, tc.b);
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted px-3 py-2">
-      <input
-        type="text"
-        value={text.content}
-        onChange={(e) => onUpdate({ content: e.target.value })}
-        placeholder="Testo"
-        className="min-w-[120px] rounded border border-input bg-input px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground"
-      />
       <select
         value={text.font ?? "helvetica"}
         onChange={(e) => onUpdate({ font: e.target.value as TextFont })}

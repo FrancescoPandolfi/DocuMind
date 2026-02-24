@@ -191,14 +191,16 @@ export function EditPanel({
         </p>
       )}
 
-      <Button
-        type="button"
-        className="w-full"
-        onClick={onApply}
-        disabled={loading || !pdfFile || overlays.length === 0}
-      >
-        {loading ? "Elaborazione..." : "Applica e scarica"}
-      </Button>
+      {pdfFile && (
+        <Button
+          type="button"
+          className="w-full"
+          onClick={onApply}
+          disabled={loading || overlays.length === 0}
+        >
+          {loading ? "Elaborazione..." : "Applica e scarica"}
+        </Button>
+      )}
     </div>
   );
 }

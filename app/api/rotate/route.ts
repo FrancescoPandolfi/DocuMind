@@ -9,9 +9,9 @@ export async function POST(request: NextRequest) {
     const pagesStr = (formData.get("pages") as string | null)?.trim() ?? "";
     const angle = parseInt(formData.get("angle") as string ?? "90", 10);
 
-    if (![90, 180, 270].includes(angle)) {
+    if (![0, 90, 180, 270].includes(angle)) {
       return NextResponse.json(
-        { error: "Angolo non valido (90, 180, 270)" },
+        { error: "Angolo non valido (0, 90, 180, 270)" },
         { status: 400 }
       );
     }

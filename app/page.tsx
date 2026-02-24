@@ -1,13 +1,8 @@
 import Link from "next/link";
-import {
-  Pencil,
-  Merge,
-  Scissors,
-  FileOutput,
-  RotateCw,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ToolsMenu } from "@/components/ToolsMenu";
+import { Logo } from "@/components/Logo";
+import { TOOLS } from "@/lib/tools";
 import {
   Card,
   CardContent,
@@ -15,50 +10,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const TOOLS: {
-  href: string;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-}[] = [
-  {
-    href: "/edit",
-    title: "Modifica PDF",
-    description: "Aggiungi testo, immagini e forme ai tuoi PDF",
-    icon: Pencil,
-  },
-  {
-    href: "/merge",
-    title: "Unisci PDF",
-    description: "Combina più file PDF in un unico documento",
-    icon: Merge,
-  },
-  {
-    href: "/split",
-    title: "Dividi PDF",
-    description: "Dividi un PDF in più file per intervalli di pagine",
-    icon: Scissors,
-  },
-  {
-    href: "/extract",
-    title: "Estrai pagine",
-    description: "Estrai pagine specifiche da un PDF",
-    icon: FileOutput,
-  },
-  {
-    href: "/rotate",
-    title: "Ruota pagine",
-    description: "Ruota pagine di 90°, 180° o 270°",
-    icon: RotateCw,
-  },
-  {
-    href: "/remove",
-    title: "Rimuovi pagine",
-    description: "Rimuovi pagine specifiche da un PDF",
-    icon: Trash2,
-  },
-];
 
 export default function Home() {
   return (
@@ -68,27 +19,21 @@ export default function Home() {
         aria-hidden
       />
       <div className="relative z-10">
-      <header className="border-b border-border bg-background/95 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/95 shadow-[0_4px_20px_rgba(0,0,0,0.4)] backdrop-blur-sm">
         <div className="mx-auto max-w-5xl px-4 py-5">
-          <div className="flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-primary/20">
-              <svg
-                className="size-5 text-primary"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10">
+                <Logo size={28} className="text-primary" />
+              </div>
+              <h1 className="text-xl font-bold tracking-tight text-foreground">
+                DocuMind
+              </h1>
+            </Link>
+            <div className="flex items-center gap-2">
+              <ToolsMenu />
+              <ThemeToggle />
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              DocuMind
-            </h1>
           </div>
         </div>
       </header>
