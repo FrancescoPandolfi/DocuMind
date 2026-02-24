@@ -2,6 +2,8 @@
 
 **DocuMind** è un'applicazione web per gestire e manipolare file PDF. Unisci, dividi, ruota, estrai pagine, rimuovi contenuti e modifica i tuoi documenti PDF direttamente dal browser.
 
+**[→ Apri l'app](https://docu-mind-pdf.vercel.app/)**
+
 ![DocuMind](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=flat-square&logo=typescript)
