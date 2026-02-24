@@ -13,12 +13,16 @@
 
 | Strumento | Descrizione |
 |-----------|-------------|
+| **Modifica PDF** | Aggiungi testo, immagini e forme ai tuoi PDF |
+| **Immagini in PDF** | Crea un PDF da immagini PNG o JPG |
 | **Unisci PDF** | Combina più file PDF in un unico documento |
 | **Dividi PDF** | Divide un PDF in più file per intervalli di pagine |
 | **Estrai pagine** | Estrai pagine specifiche da un PDF |
 | **Ruota pagine** | Ruota pagine di 90°, 180° o 270° |
 | **Rimuovi pagine** | Rimuovi pagine specifiche da un PDF |
-| **Modifica PDF** | Aggiungi testo, immagini e forme ai tuoi PDF |
+| **Proteggi con password** | Aggiungi protezione con password al PDF |
+| **Aggiungi watermark** | Aggiungi testo o logo su ogni pagina |
+| **Numera pagine** | Aggiungi numerazione alle pagine |
 
 ## Tecnologie
 
@@ -27,6 +31,7 @@
 - **[TypeScript](https://www.typescriptlang.org/)** – Tipizzazione statica
 - **[Tailwind CSS 4](https://tailwindcss.com/)** – Styling utility-first
 - **[pdf-lib](https://pdf-lib.js.org/)** – Manipolazione PDF lato client/server
+- **[pdf-lib-with-encrypt](https://github.com/sico/pdf-lib-with-encrypt)** – Protezione PDF con password
 - **[pdfjs-dist](https://mozilla.github.io/pdf.js/)** – Rendering e visualizzazione PDF (Modifica)
 - **[shadcn/ui](https://ui.shadcn.com/)** – Componenti UI
 - **[Lucide React](https://lucide.dev/)** – Icone
@@ -40,8 +45,8 @@
 
 ```bash
 # Clona il repository
-git clone https://github.com/FrancescoPandolfi/documind.git
-cd documind
+git clone https://github.com/FrancescoPandolfi/DocuMind.git
+cd DocuMind
 
 # Installa le dipendenze
 npm install
@@ -64,26 +69,31 @@ L'app sarà disponibile su [http://localhost:3000](http://localhost:3000).
 ## Struttura del progetto
 
 ```
-documind/
+DocuMind/
 ├── app/
-│   ├── api/              # API Routes (merge, split, extract, rotate, remove, edit)
+│   ├── api/              # API Routes (merge, split, extract, rotate, remove, edit, protect, watermark, page-numbers, images-to-pdf)
 │   ├── edit/             # Pagina Modifica PDF
+│   ├── images-to-pdf/    # Pagina Immagini in PDF
 │   ├── merge/            # Pagina Unisci PDF
 │   ├── split/            # Pagina Dividi PDF
 │   ├── extract/          # Pagina Estrai pagine
 │   ├── rotate/           # Pagina Ruota pagine
-│   ├── remove/            # Pagina Rimuovi pagine
+│   ├── remove/           # Pagina Rimuovi pagine
+│   ├── protect/          # Pagina Proteggi con password
+│   ├── watermark/        # Pagina Aggiungi watermark
+│   ├── page-numbers/     # Pagina Numera pagine
 │   ├── layout.tsx        # Layout principale
 │   ├── page.tsx          # Homepage
 │   └── globals.css       # Stili globali
 ├── components/           # Componenti React
 │   ├── ui/               # Componenti shadcn/ui
 │   ├── FileDrop.tsx      # Dropzone per file
-│   ├── MergeForm.tsx     # Form Unisci PDF
 │   ├── PdfPreview.tsx    # Anteprima PDF
+│   ├── ToolsMenu.tsx     # Menu strumenti
 │   └── ...
 ├── lib/
 │   ├── pdf-service.ts    # Logica di manipolazione PDF
+│   ├── tools.ts          # Registro strumenti
 │   └── utils.ts          # Utility
 └── package.json
 ```
@@ -100,6 +110,10 @@ Le operazioni PDF sono esposte come API Route Next.js:
 | `/api/rotate` | POST | Ruota pagine (FormData: `file`, `rotations`) |
 | `/api/remove` | POST | Rimuove pagine (FormData: `file`, `pages`) |
 | `/api/edit` | POST | Modifica PDF (FormData: `file`, `overlays` JSON) |
+| `/api/protect` | POST | Protegge PDF con password (FormData: `file`, `userPassword`, `ownerPassword`) |
+| `/api/watermark` | POST | Aggiunge watermark (FormData: `file`, `text`, `position`, `opacity`, `image`) |
+| `/api/page-numbers` | POST | Aggiunge numerazione pagine (FormData: `file`, `position`, `startFrom`) |
+| `/api/images-to-pdf` | POST | Crea PDF da immagini (FormData: `files`) |
 
 ## Privacy e sicurezza
 
@@ -116,4 +130,4 @@ Questo progetto è privato. Per informazioni sulla licenza, contatta il maintain
 **Francesco Pandolfi**
 
 - GitHub: [@FrancescoPandolfi](https://github.com/FrancescoPandolfi)
-- Repository: [documind](https://github.com/FrancescoPandolfi/documind)
+- Repository: [DocuMind](https://github.com/FrancescoPandolfi/DocuMind)
