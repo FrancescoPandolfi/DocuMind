@@ -414,7 +414,7 @@ export function PdfPreview({
                       style={{
                         left: `${t.x}%`,
                         bottom: `${t.y}%`,
-                        fontSize: t.size ?? 12,
+                        fontSize: `${(t.size ?? 12) * mainScale}px`,
                         color: `rgb(${c.r * 255},${c.g * 255},${c.b * 255})`,
                       }}
                       onClick={(e) => e.stopPropagation()}
