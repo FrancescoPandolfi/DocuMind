@@ -136,84 +136,6 @@ export async function removePages(
   return Buffer.from(await newPdf.save());
 }
 
-export type CompressionLevel = "normal" | "high" | "maximum";
-
-/** PDFSETTINGS per Ghostscript: screen=minimo, ebook=medio, printer=massima qualità */
-const GS_PDFSETTINGS: Record<CompressionLevel, string> = {
-  normal: "/printer",
-  high: "/ebook",
-  maximum: "/screen",
-};
-
-async function compressWithGhostscript(
-  buffer: Buffer,
-  level: CompressionLevel
-): Promise<Buffer | null> {
-  const { spawn } = await import("child_process");
-  const settings = GS_PDFSETTINGS[level];
-
-  return new Promise((resolve) => {
-    const gs = spawn(
-      "gs",
-      [
-        "-sDEVICE=pdfwrite",
-        "-dCompatibilityLevel=1.4",
-        `-dPDFSETTINGS=${settings}`,
-        "-dNOPAUSE",
-        "-dQUIET",
-        "-dBATCH",
-        "-sOutputFile=-",
-        "-",
-      ],
-      { stdio: ["pipe", "pipe", "pipe"] }
-    );
-
-    const chunks: Buffer[] = [];
-    gs.stdout.on("data", (chunk: Buffer) => chunks.push(chunk));
-    gs.stderr.on("data", () => {});
-
-    const timeout = setTimeout(() => {
-      gs.kill("SIGKILL");
-      resolve(null);
-    }, 60000);
-
-    gs.on("error", () => {
-      clearTimeout(timeout);
-      resolve(null);
-    });
-    gs.on("close", (code) => {
-      clearTimeout(timeout);
-      if (code === 0) resolve(Buffer.concat(chunks));
-      else resolve(null);
-    });
-
-    gs.stdin.write(buffer);
-    gs.stdin.end();
-  });
-}
-
-export type CompressionResult = { buffer: Buffer; method: "ghostscript" | "fallback" };
-
-export async function compressPdf(
-  buffer: Buffer,
-  level: CompressionLevel = "high"
-): Promise<CompressionResult> {
-  const gsResult = await compressWithGhostscript(buffer, level);
-  if (gsResult && gsResult.length > 0) {
-    return { buffer: gsResult, method: "ghostscript" };
-  }
-
-  const pdf = await PDFDocument.load(buffer);
-  const newPdf = await PDFDocument.create();
-  const pages = await newPdf.copyPages(pdf, pdf.getPageIndices());
-  for (const page of pages) {
-    newPdf.addPage(page);
-  }
-  const result = Buffer.from(await newPdf.save({ useObjectStreams: true }));
-  const final = result.length < buffer.length ? result : buffer;
-  return { buffer: final, method: "fallback" };
-}
-
 export async function protectPdf(
   buffer: Buffer,
   userPassword: string,
@@ -225,12 +147,6 @@ export async function protectPdf(
     userPassword,
     ...(ownerPassword && { ownerPassword }),
   });
-  return Buffer.from(await pdf.save());
-}
-
-export async function unprotectPdf(buffer: Buffer, password: string): Promise<Buffer> {
-  const { PDFDocument } = await import("pdf-lib-with-encrypt");
-  const pdf = await PDFDocument.load(buffer, { password });
   return Buffer.from(await pdf.save());
 }
 
